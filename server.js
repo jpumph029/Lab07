@@ -61,7 +61,7 @@ function getWeather(req, res) {
 // ==============================Restraunt Api==========================================
 function Yelp(businesses) {
   this.name = businesses.name;
-  this.imgUrl = businesses.image_url;
+  this.image_url = businesses.image_url;
   this.price = businesses.price;
   this.rating = businesses.rating;
   this.url = businesses.url;
