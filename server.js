@@ -87,21 +87,21 @@ function Movie(movie) {
   this.overview = movie.overview;
   this.average_votes = movie.average_votes;
   this.total_votes = movie.total_votes;
-  this.image_url = movie.image_url;
+  this.image_url = 'https://image.tmdb.org/t/p/w370_and_h556_bestv2/' + movie.poster_path;
   this.popularity = movie.popularity;
   this.release_on = movie.release_on;
 }
 
-app.get('/movie', getMovie);
+app.get('/movies', getMovie);
 
 function getMovie(req, res) {
-  superagent.get(`https://api.themoviedb.org/3/movie/search?location=${req.query.data.search_query}/${req.query.data.latitude},${req.query.data.longitude}`)
-    .set('Authorization', `Bearer ${process.env.THEMOVIEDB_API_KEY}`)
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIE_API_KEY}&query=${req.query.data.search_query}`;
+  superagent.get(url)
     .then(result => {
-      const getMovie = result.body.movie.map(movie => {
+      const movieSum = result.body.results.map(movie => {
         return new Movie(movie);
       });
-      res.send(getMovie);
+      res.send(movieSum);
     })
     .catch(error => handleError(error));
 }
