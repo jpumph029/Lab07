@@ -73,14 +73,38 @@ function getBusiness(req, res) {
   superagent.get(`https://api.yelp.com/v3/businesses/search?location=${req.query.data.search_query}/${req.query.data.latitude},${req.query.data.longitude}`)
     .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
     .then(result => {
-        const getBusiness = result.body.businesses.map(business => {
-          return new Yelp(business);
-        });
-        res.send(getBusiness);
-      })
-        .catch(error => handleError(error));
+      const getBusiness = result.body.businesses.map(business => {
+        return new Yelp(business);
+      });
+      res.send(getBusiness);
+    })
+    .catch(error => handleError(error));
 }
 
+// =============================Movie API==============================================
+function Movie(movie) {
+  this.title = movie.title;
+  this.overview = movie.overview;
+  this.average_votes = movie.average_votes;
+  this.total_votes = movie.total_votes;
+  this.image_url = movie.image_url;
+  this.popularity = movie.popularity;
+  this.release_on = movie.release_on;
+}
+
+app.get('/movie', getMovie);
+
+function getMovie(req, res) {
+  superagent.get(`https://api.themoviedb.org/3/movie/search?location=${req.query.data.search_query}/${req.query.data.latitude},${req.query.data.longitude}`)
+    .set('Authorization', `Bearer ${process.env.THEMOVIEDB_API_KEY}`)
+    .then(result => {
+      const getMovie = result.body.movie.map(movie => {
+        return new Movie(movie);
+      });
+      res.send(getMovie);
+    })
+    .catch(error => handleError(error));
+}
 
 // Error Handler
 function handleError(err, res) {
