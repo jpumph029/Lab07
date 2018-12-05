@@ -17,8 +17,8 @@ app.use(cors());
 // ===========================Location api=======================================
 app.get('/location', (req, res) => {
   searchToLatLong(req.query.data)
-  .then(location => res.send(location))
-  .catch(error => handleError(error, res));
+    .then(location => res.send(location))
+    .catch(error => handleError(error, res));
 });
 
 function Location(query, res) {
@@ -50,23 +50,44 @@ function getWeather(req, res) {
   const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${req.query.data.latitude},${req.query.data.longitude}`;
 
   superagent.get(url)
-  .then(result => {
-    const weatherSummaries = result.body.daily.data.map(day => {
-      return new Weather(day);
-    });
+    .then(result => {
+      const weatherSummaries = result.body.daily.data.map(day => {
+        return new Weather(day);
+      });
+      res.send(weatherSummaries);
+    })
+    .catch(error => handleError(error));
+}
+// ==============================Restraunt Api==========================================
+function Yelp(businesses) {
+  this.name = businesses.name;
+  this.imgUrl = businesses.image_url;
+  this.price = businesses.price;
+  this.rating = businesses.rating;
+  this.url = businesses.url;
+}
 
-    res.send(weatherSummaries);
-  })
-  .catch(error => handleError(error));
+app.get('/yelp', getBusiness);
+
+function getBusiness(req, res) {
+  superagent.get(`https://api.yelp.com/v3/businesses/search?location=${req.query.data.search_query}/${req.query.data.latitude},${req.query.data.longitude}`)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .then(result => {
+        const getBusiness = result.body.businesses.map(business => {
+          return new Yelp(business);
+        });
+        res.send(getBusiness);
+      })
+        .catch(error => handleError(error));
 }
 
 
 // Error Handler
-function handleError(err,res) {
+function handleError(err, res) {
   console.error(err);
-  if (res)res.satus(500).send('Sorry, something broke');
+  if (res) res.satus(500).send('Sorry, something broke');
 }
- 
+
 // **************a test route that gives you turtle tim.*****************
 // app.get('/testroute', function (req, res) {
 //     let animal = { type: 'turtle', name: 'tim' };
